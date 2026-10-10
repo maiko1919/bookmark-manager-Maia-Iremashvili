@@ -1,4 +1,4 @@
-function FilterBar({ tags, selectedTag, onSelectTag }) {
+function FilterBar({ tags, selectedTags, onSelectTag }) {
   return (
     <div style={{
       display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '20px'
@@ -8,9 +8,9 @@ function FilterBar({ tags, selectedTag, onSelectTag }) {
         style={{
           padding: '4px 12px', fontSize: '13px', borderRadius: '20px',
           border: '1px solid var(--border)',
-          background: selectedTag === 'All' ? 'var(--accent)' : 'transparent',
-          color: selectedTag === 'All' ? 'white' : 'var(--text-secondary)',
-          fontWeight: selectedTag === 'All' ? '600' : '400',
+          background: selectedTags.length === 0 ? 'var(--accent)' : 'transparent',
+          color: selectedTags.length === 0 ? 'white' : 'var(--text-secondary)',
+          fontWeight: selectedTags.length === 0 ? '600' : '400',
           cursor: 'pointer'
         }}
       >
@@ -23,9 +23,9 @@ function FilterBar({ tags, selectedTag, onSelectTag }) {
           style={{
             padding: '4px 12px', fontSize: '13px', borderRadius: '20px',
             border: '1px solid var(--border)',
-            background: selectedTag === tag ? 'var(--accent)' : 'transparent',
-            color: selectedTag === tag ? 'white' : 'var(--text-secondary)',
-            fontWeight: selectedTag === tag ? '600' : '400',
+            background: selectedTags.includes(tag) ? 'var(--accent)' : 'transparent',
+            color: selectedTags.includes(tag) ? 'white' : 'var(--text-secondary)',
+            fontWeight: selectedTags.includes(tag) ? '600' : '400',
             cursor: 'pointer'
           }}
         >

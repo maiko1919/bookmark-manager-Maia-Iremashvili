@@ -1,3 +1,5 @@
+import TagList from './TagList'
+
 function BookmarkCard({ bookmark, onEdit, onDelete, onPin, onArchive }) {
   const { id, title, url, description, tags, isPinned, isArchived } = bookmark
 
@@ -63,29 +65,17 @@ function BookmarkCard({ bookmark, onEdit, onDelete, onPin, onArchive }) {
         </p>
       )}
 
-      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-        {tags.map(tag => (
-          <span key={tag} style={{
-            background: 'var(--tag-bg)',
-            color: 'var(--tag-text)',
-            padding: '2px 8px',
-            borderRadius: '20px',
-            fontSize: '11px',
-            fontWeight: '500'
-          }}>
-            {tag}
-          </span>
-        ))}
-        {isArchived && (
-          <span style={{
-            background: '#fef3c7', color: '#92400e',
-            padding: '2px 8px', borderRadius: '20px',
-            fontSize: '11px', fontWeight: '500'
-          }}>
-            Archived
-          </span>
-        )}
-      </div>
+      <TagList tags={tags} />
+
+      {isArchived && (
+        <span style={{
+          background: '#fef3c7', color: '#92400e',
+          padding: '2px 8px', borderRadius: '20px',
+          fontSize: '11px', fontWeight: '500', alignSelf: 'flex-start'
+        }}>
+          Archived
+        </span>
+      )}
 
       <div style={{
         display: 'flex', gap: '6px',
@@ -93,7 +83,6 @@ function BookmarkCard({ bookmark, onEdit, onDelete, onPin, onArchive }) {
       }}>
         <button
           onClick={() => onPin(id)}
-          title={isPinned ? 'Unpin' : 'Pin'}
           style={{
             padding: '4px 10px', fontSize: '12px',
             border: '1px solid var(--border)',

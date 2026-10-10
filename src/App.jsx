@@ -13,7 +13,7 @@ function App() {
   const [bookmarks, setBookmarks] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedTag, setSelectedTag] = useState('All')
+  const [selectedTags, setSelectedTags] = useState([])
   const [sortOrder, setSortOrder] = useState('newest')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingBookmark, setEditingBookmark] = useState(null)
@@ -49,6 +49,11 @@ function App() {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
 
+  useEffect(() => {
+    const count = bookmarks.filter(b => !b.isArchived).length
+    document.title = `Bookmarks (${count})`
+  }, [bookmarks])
+
   const handleDelete = (id) => setDeleteConfirmId(id)
 
   const confirmDelete = () => {
@@ -68,6 +73,12 @@ function App() {
     )
   }
 
+  const handleFavorite = (id) => {
+    setBookmarks(prev =>
+      prev.map(b => b.id === id ? { ...b, isFavorite: !b.isFavorite } : b)
+    )
+  }
+
   const handleEdit = (bookmark) => {
     setEditingBookmark(bookmark)
     setIsModalOpen(true)
@@ -83,7 +94,8 @@ function App() {
         id: Date.now(),
         ...formData,
         isPinned: false,
-        isArchived: false
+        isArchived: false,
+        isFavorite: false
       }
       setBookmarks(prev => [newBookmark, ...prev])
     }
@@ -96,15 +108,29 @@ function App() {
     setEditingBookmark(null)
   }
 
+  const handleTagSelect = (tag) => {
+    if (tag === 'All') {
+      setSelectedTags([])
+      return
+    }
+    setSelectedTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    )
+  }
+
   const allTags = [...new Set(bookmarks.flatMap(b => b.tags))].sort()
 
   const filteredBookmarks = bookmarks
-    .filter(b => view === 'archived' ? b.isArchived : !b.isArchived)
+    .filter(b => {
+      if (view === 'archived') return b.isArchived
+      if (view === 'favorites') return b.isFavorite && !b.isArchived
+      return !b.isArchived
+    })
     .filter(b => {
       const term = searchTerm.toLowerCase()
       return b.title.toLowerCase().includes(term) || b.description.toLowerCase().includes(term)
     })
-    .filter(b => selectedTag === 'All' || b.tags.includes(selectedTag))
+    .filter(b => selectedTags.length === 0 || selectedTags.every(tag => b.tags.includes(tag)))
     .sort((a, b) => {
       if (view === 'all') {
         if (a.isPinned !== b.isPinned) return b.isPinned - a.isPinned
@@ -131,10 +157,10 @@ function App() {
     <div className="app">
       <Sidebar
         view={view}
-        onViewChange={(v) => { setView(v); setSelectedTag('All') }}
+        onViewChange={(v) => { setView(v); setSelectedTags([]) }}
         tags={allTags}
-        selectedTag={selectedTag}
-        onSelectTag={setSelectedTag}
+        selectedTags={selectedTags}
+        onSelectTag={handleTagSelect}
         bookmarks={bookmarks}
       />
 
@@ -150,12 +176,12 @@ function App() {
         <main style={{ flex: 1, padding: '24px 32px', overflowY: 'auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)' }}>
-              {view === 'archived' ? 'Archived bookmarks' : searchTerm ? `Results for: "${searchTerm}"` : 'All bookmarks'}
+              {view === 'archived' ? 'Archived bookmarks' : view === 'favorites' ? 'Favorite bookmarks' : searchTerm ? `Results for: "${searchTerm}"` : 'All bookmarks'}
             </h2>
             <SortSelect sortOrder={sortOrder} onSort={setSortOrder} />
           </div>
 
-          <FilterBar tags={allTags} selectedTag={selectedTag} onSelectTag={setSelectedTag} />
+          <FilterBar tags={allTags} selectedTags={selectedTags} onSelectTag={handleTagSelect} />
 
           <BookmarkList
             bookmarks={filteredBookmarks}
@@ -163,6 +189,7 @@ function App() {
             onDelete={handleDelete}
             onPin={handlePin}
             onArchive={handleArchive}
+            onFavorite={handleFavorite}
             view={view}
             searchTerm={searchTerm}
           />
