@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import BookmarkList from './components/BookmarkList'
-import SearchBar from './components/SearchBar'
 import FilterBar from './components/FilterBar'
 import SortSelect from './components/SortSelect'
 import Modal from './components/Modal'
@@ -12,6 +11,7 @@ import './App.css'
 function App() {
   const [bookmarks, setBookmarks] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTags, setSelectedTags] = useState([])
   const [sortOrder, setSortOrder] = useState('newest')
@@ -29,9 +29,16 @@ function App() {
     } else {
       setTimeout(() => {
         fetch('/data/bookmarks.json')
-          .then(res => res.json())
+          .then(res => {
+            if (!res.ok) throw new Error('Failed to load bookmarks')
+            return res.json()
+          })
           .then(data => {
             setBookmarks(data)
+            setIsLoading(false)
+          })
+          .catch(err => {
+            setError(err.message)
             setIsLoading(false)
           })
       }, 1000)
@@ -153,6 +160,31 @@ function App() {
     )
   }
 
+  if (error) {
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', minHeight: '100vh',
+        background: 'var(--bg-main)', color: 'var(--text-primary)',
+        gap: '16px'
+      }}>
+        <span style={{ fontSize: '48px' }}>⚠️</span>
+        <h2 style={{ fontSize: '20px', fontWeight: '600' }}>Something went wrong</h2>
+        <p style={{ color: 'var(--text-secondary)' }}>{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            padding: '10px 20px', background: 'var(--accent)',
+            color: 'white', border: 'none', borderRadius: '8px',
+            fontSize: '14px', cursor: 'pointer'
+          }}
+        >
+          Try again
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className="app">
       <Sidebar
@@ -176,12 +208,19 @@ function App() {
         <main style={{ flex: 1, padding: '24px 32px', overflowY: 'auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)' }}>
-              {view === 'archived' ? 'Archived bookmarks' : view === 'favorites' ? 'Favorite bookmarks' : searchTerm ? `Results for: "${searchTerm}"` : 'All bookmarks'}
+              {view === 'archived' ? 'Archived bookmarks'
+                : view === 'favorites' ? 'Favorite bookmarks'
+                : searchTerm ? `Results for: "${searchTerm}"`
+                : 'All bookmarks'}
             </h2>
             <SortSelect sortOrder={sortOrder} onSort={setSortOrder} />
           </div>
 
-          <FilterBar tags={allTags} selectedTags={selectedTags} onSelectTag={handleTagSelect} />
+          <FilterBar
+            tags={allTags}
+            selectedTags={selectedTags}
+            onSelectTag={handleTagSelect}
+          />
 
           <BookmarkList
             bookmarks={filteredBookmarks}

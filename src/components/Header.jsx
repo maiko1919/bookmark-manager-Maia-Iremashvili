@@ -1,4 +1,18 @@
+import { useState, useEffect } from 'react'
+
 function Header({ theme, onToggleTheme, onAddClick, searchTerm, onSearch }) {
+  const [time, setTime] = useState(new Date())
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(new Date())
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const formattedDate = time.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
+
   return (
     <header style={{
       height: '64px',
@@ -38,6 +52,14 @@ function Header({ theme, onToggleTheme, onAddClick, searchTerm, onSearch }) {
             }}
           />
         </div>
+      </div>
+
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.4
+      }}>
+        <span style={{ fontWeight: '600', fontSize: '14px' }}>{formattedTime}</span>
+        <span>{formattedDate}</span>
       </div>
 
       <button
