@@ -35,7 +35,7 @@ function BookmarkList({ bookmarks, onEdit, onDelete, onPin, onArchive, onFavorit
   }
 
   return (
-    <div style={{
+    <div className="bookmarks-grid" style={{
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
       gap: '16px'

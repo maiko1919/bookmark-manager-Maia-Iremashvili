@@ -16,7 +16,7 @@ function Sidebar({ view, onViewChange, tags, selectedTags, onSelectTag, bookmark
   })
 
   return (
-    <aside style={{
+    <aside className="sidebar" style={{
       width: '240px', minHeight: '100vh',
       background: 'var(--bg-sidebar)',
       borderRight: '1px solid var(--border)',
@@ -47,7 +47,7 @@ function Sidebar({ view, onViewChange, tags, selectedTags, onSelectTag, bookmark
         </button>
       </nav>
 
-      <div style={{ padding: '0 8px', flex: 1, overflowY: 'auto' }}>
+      <div className="sidebar-tags" style={{ padding: '0 8px', flex: 1, overflowY: 'auto' }}>
         <p style={{
           fontSize: '11px', fontWeight: '600', color: 'var(--text-muted)',
           padding: '8px 12px', textTransform: 'uppercase', letterSpacing: '0.5px'
