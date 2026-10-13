@@ -1,6 +1,6 @@
 import BookmarkCard from './BookmarkCard'
 
-function BookmarkList({ bookmarks, onEdit, onDelete, onPin, onArchive, view, searchTerm }) {
+function BookmarkList({ bookmarks, onEdit, onDelete, onPin, onArchive, onFavorite, view, searchTerm }) {
   if (bookmarks.length === 0) {
     return (
       <div style={{
@@ -10,13 +10,15 @@ function BookmarkList({ bookmarks, onEdit, onDelete, onPin, onArchive, view, sea
         textAlign: 'center'
       }}>
         <div style={{ fontSize: '48px', marginBottom: '16px' }}>
-          {searchTerm ? '🔍' : view === 'archived' ? '🗄️' : '🔖'}
+          {searchTerm ? '🔍' : view === 'archived' ? '🗄️' : view === 'favorites' ? '⭐' : '🔖'}
         </div>
         <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-secondary)' }}>
           {searchTerm
             ? `No results for "${searchTerm}"`
             : view === 'archived'
             ? 'No archived bookmarks'
+            : view === 'favorites'
+            ? 'No favorite bookmarks'
             : 'No bookmarks yet'}
         </h3>
         <p style={{ fontSize: '14px' }}>
@@ -24,6 +26,8 @@ function BookmarkList({ bookmarks, onEdit, onDelete, onPin, onArchive, view, sea
             ? 'Try a different search term'
             : view === 'archived'
             ? 'Archived bookmarks will appear here'
+            : view === 'favorites'
+            ? 'Click ☆ to add bookmarks to favorites'
             : 'Click "+ Add Bookmark" to get started'}
         </p>
       </div>
@@ -44,6 +48,7 @@ function BookmarkList({ bookmarks, onEdit, onDelete, onPin, onArchive, view, sea
           onDelete={onDelete}
           onPin={onPin}
           onArchive={onArchive}
+          onFavorite={onFavorite}
         />
       ))}
     </div>

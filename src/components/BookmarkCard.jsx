@@ -1,7 +1,7 @@
 import TagList from './TagList'
 
-function BookmarkCard({ bookmark, onEdit, onDelete, onPin, onArchive }) {
-  const { id, title, url, description, tags, isPinned, isArchived } = bookmark
+function BookmarkCard({ bookmark, onEdit, onDelete, onPin, onArchive, onFavorite }) {
+  const { id, title, url, description, tags, isPinned, isArchived, isFavorite } = bookmark
 
   const domain = (() => {
     try { return new URL(url).hostname }
@@ -20,19 +20,31 @@ function BookmarkCard({ bookmark, onEdit, onDelete, onPin, onArchive }) {
       flexDirection: 'column',
       gap: '10px',
       boxShadow: 'var(--shadow)',
-      transition: 'box-shadow 0.2s',
       position: 'relative'
     }}>
-      {isPinned && (
-        <div style={{
-          position: 'absolute', top: '12px', right: '12px',
-          fontSize: '12px', color: 'var(--accent)', fontWeight: '600'
-        }}>
-          📌
-        </div>
-      )}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      {/* Favorite და Pin ღილაკები */}
+      <div style={{
+        position: 'absolute', top: '8px', right: '8px',
+        display: 'flex', alignItems: 'center', gap: '4px'
+      }}>
+        {isPinned && <span style={{ fontSize: '14px' }}>📌</span>}
+        <button
+          onClick={() => onFavorite(id)}
+          style={{
+            background: 'none', border: 'none',
+            cursor: 'pointer', fontSize: '18px',
+            padding: '0', lineHeight: 1,
+            color: isFavorite ? '#f59e0b' : 'var(--text-muted)'
+          }}
+          title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+        >
+          {isFavorite ? '★' : '☆'}
+        </button>
+      </div>
+
+      {/* Title და favicon */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingRight: '52px' }}>
         <img
           src={favicon}
           alt=""
@@ -55,6 +67,7 @@ function BookmarkCard({ bookmark, onEdit, onDelete, onPin, onArchive }) {
         </div>
       </div>
 
+      {/* Description */}
       {description && (
         <p style={{
           fontSize: '13px', color: 'var(--text-secondary)',
@@ -65,8 +78,10 @@ function BookmarkCard({ bookmark, onEdit, onDelete, onPin, onArchive }) {
         </p>
       )}
 
+      {/* Tags */}
       <TagList tags={tags} />
 
+      {/* Archived badge */}
       {isArchived && (
         <span style={{
           background: '#fef3c7', color: '#92400e',
@@ -77,6 +92,7 @@ function BookmarkCard({ bookmark, onEdit, onDelete, onPin, onArchive }) {
         </span>
       )}
 
+      {/* Action buttons */}
       <div style={{
         display: 'flex', gap: '6px',
         paddingTop: '8px', borderTop: '1px solid var(--border)'
@@ -85,8 +101,7 @@ function BookmarkCard({ bookmark, onEdit, onDelete, onPin, onArchive }) {
           onClick={() => onPin(id)}
           style={{
             padding: '4px 10px', fontSize: '12px',
-            border: '1px solid var(--border)',
-            borderRadius: '6px',
+            border: '1px solid var(--border)', borderRadius: '6px',
             background: isPinned ? 'var(--tag-bg)' : 'transparent',
             color: isPinned ? 'var(--accent)' : 'var(--text-secondary)'
           }}
@@ -97,9 +112,8 @@ function BookmarkCard({ bookmark, onEdit, onDelete, onPin, onArchive }) {
           onClick={() => onEdit(bookmark)}
           style={{
             padding: '4px 10px', fontSize: '12px',
-            border: '1px solid var(--border)',
-            borderRadius: '6px', background: 'transparent',
-            color: 'var(--text-secondary)'
+            border: '1px solid var(--border)', borderRadius: '6px',
+            background: 'transparent', color: 'var(--text-secondary)'
           }}
         >
           ✏️ Edit
@@ -108,9 +122,8 @@ function BookmarkCard({ bookmark, onEdit, onDelete, onPin, onArchive }) {
           onClick={() => onArchive(id)}
           style={{
             padding: '4px 10px', fontSize: '12px',
-            border: '1px solid var(--border)',
-            borderRadius: '6px', background: 'transparent',
-            color: 'var(--text-secondary)'
+            border: '1px solid var(--border)', borderRadius: '6px',
+            background: 'transparent', color: 'var(--text-secondary)'
           }}
         >
           {isArchived ? '📤 Restore' : '🗄️ Archive'}
@@ -119,9 +132,8 @@ function BookmarkCard({ bookmark, onEdit, onDelete, onPin, onArchive }) {
           onClick={() => onDelete(id)}
           style={{
             padding: '4px 10px', fontSize: '12px',
-            border: '1px solid #fca5a5',
-            borderRadius: '6px', background: 'transparent',
-            color: '#ef4444', marginLeft: 'auto'
+            border: '1px solid #fca5a5', borderRadius: '6px',
+            background: 'transparent', color: '#ef4444', marginLeft: 'auto'
           }}
         >
           🗑️
